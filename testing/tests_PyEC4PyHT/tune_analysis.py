@@ -16,8 +16,8 @@ def tune_analysis(x_i, xp_i, y_i, yp_i):
 		spectrum_y = np.abs(np.fft.fft(y_i, axis=1))[:, :n_turns / 2]
 		tune_peak_y = np.float_(np.argmax(spectrum_y, axis=1)) / float(n_turns)
 
-		print 'analysing particle spectra ... this may take some time.'
-		for p_idx in xrange(macroparticlenumber):
+		print('analysing particle spectra ... this may take some time.')
+		for p_idx in range(macroparticlenumber):
 
 			SX = Sussix()
 			SX.sussix_inp(nt1=1, nt2=n_turns, idam=2, ir=0, tunex=tune_peak_x[p_idx], tuney=tune_peak_y[p_idx])

@@ -50,8 +50,8 @@
 #-End-preamble---------------------------------------------------------
 
 import numpy as np
-import hist_for as histf
-import seg_impact as segi
+from . import hist_for as histf
+from . import seg_impact as segi
 from scipy.constants import e as qe
 
 
@@ -62,7 +62,7 @@ class impact_management(object):
         cos_angle_width=0.05, flag_cos_angle_hist=True
     ):
 
-        print 'Start impact man. init.'
+        print('Start impact man. init.')
 
         if flag_seg and chamb.chamb_type != 'polyg':
                 raise ValueError("""flag_seg can be True only with chamb_type='polyg'!!!!""")
@@ -90,9 +90,9 @@ class impact_management(object):
             self.cos_angle_width = cos_angle_width
             N_angles = int(1. / cos_angle_width) + 1
             self.cos_angle_hist = np.zeros(N_angles, float)
-            print 'Saving cosine of angle of incident electrons.'
+            print('Saving cosine of angle of incident electrons.')
         else:
-            print 'Not saving cosine of angle of incident electrons.'
+            print('Not saving cosine of angle of incident electrons.')
 
         self.xg_hist = xg_hist
         self.Nxg_hist = Nxg_hist
@@ -113,7 +113,7 @@ class impact_management(object):
             self.nel_hist_emit_seg = np.zeros(chamb.N_vert, float)
             self.energ_eV_impact_seg = np.zeros(chamb.N_vert, float)
 
-        print 'Done impact man. init.'
+        print('Done impact man. init.')
 
     def reset_impact_hist_tot(self):
         self.nel_impact_hist_tot *= 0.
@@ -285,12 +285,12 @@ class impact_management(object):
     def extract_sey_curves(self, n_rep, E_impact_eV_test, cos_theta_test, charge, mass):
 
         deltas = {}
-        for etype in self.sey_mod.event_types.keys():
+        for etype in list(self.sey_mod.event_types.keys()):
             etype_name = self.sey_mod.event_types[etype]
             deltas[etype_name] = np.zeros((len(cos_theta_test), len(E_impact_eV_test)))
         print('Extracting SEY curves...')
         for i_ct, ct in enumerate(cos_theta_test):
-            print('%d/%d' % (i_ct + 1, len(cos_theta_test)))
+            print(('%d/%d' % (i_ct + 1, len(cos_theta_test))))
             for i_ene, Ene in enumerate(E_impact_eV_test):
 
                 # nel_emit, flag_elast, flag_truesec = sey_mod.SEY_process(nel_impact=np.ones(n_rep),
@@ -317,7 +317,7 @@ class impact_management(object):
                         nel_mp_th=1,
                         flag_seg=True)
 
-                for etype in self.sey_mod.event_types.keys():
+                for etype in list(self.sey_mod.event_types.keys()):
                     etype_name = self.sey_mod.event_types[etype]
                     thisdelta = deltas[etype_name]
                     thisdelta[i_ct, i_ene] = np.sum(nel_emit_tot_events[event_type == etype]) / np.sum(nel_impact)

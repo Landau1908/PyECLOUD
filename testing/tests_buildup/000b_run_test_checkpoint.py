@@ -1,4 +1,4 @@
-from __future__ import division, print_function
+
 import sys
 import os
 import time
@@ -45,7 +45,7 @@ print('TIMER STARTED')
 time_0 = time.time()
 try:
     sim.run()
-except KillSimulation, exc:
+except KillSimulation as exc:
     print(exc)
     print("Checkpoint test: Termination done!")
 
