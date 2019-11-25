@@ -599,6 +599,7 @@ class pyecloud_saver:
                                      'nel_mp_ref_time',
                                      'Nel_cross_ion',
                                      'N_mp_cross_ion',
+                                     'E_eV_cross_ion',
                                      'DN_cross_ion',
                                      'En_electric_eV_time',
                                      't']
@@ -708,6 +709,7 @@ class pyecloud_saver:
             if self.flag_cross_ion:
                 list_members.append('Nel_cross_ion')
                 list_members.append('N_mp_cross_ion')
+                list_members.append('E_eV_cross_ion')
                 list_members.append('DN_cross_ion')
 
             if self.flag_electric_energy:
@@ -766,10 +768,12 @@ class pyecloud_saver:
         if self.flag_cross_ion:
             self.Nel_cross_ion = 0. * self.t
             self.N_mp_cross_ion = 0 * self.t
+            self.E_eV_cross_ion = 0 * self.t
             self.DN_cross_ion = 0 * self.t
         else:
             self.Nel_cross_ion = -1
             self.N_mp_cross_ion = -1
+            self.E_eV_cross_ion = -1
             self.DN_cross_ion = -1
 
         if self.flag_electric_energy:
@@ -856,6 +860,7 @@ class pyecloud_saver:
             if self.flag_cross_ion:
                 (self.Nel_cross_ion[self.i_last_save],
                     self.N_mp_cross_ion[self.i_last_save],
+                    self.E_eV_cross_ion[self.i_last_save],
                     self.DN_cross_ion[self.i_last_save]) = cross_ion.save_cross_ion_data(self.cloud_name)
 
             if self.step_by_step_custom_observables is not None:
@@ -882,6 +887,7 @@ class pyecloud_saver:
         if self.flag_cross_ion:
             dict_sbs_data['Nel_cross_ion'] = self.Nel_cross_ion[:self.i_last_save + 1]
             dict_sbs_data['N_mp_cross_ion'] = self.N_mp_cross_ion[:self.i_last_save + 1]
+            dict_sbs_data['E_eV_cross_ion'] = self.E_eV_cross_ion[:self.i_last_save + 1]
             dict_sbs_data['DN_cross_ion'] = self.DN_cross_ion[:self.i_last_save + 1]
 
         if self.flag_electric_energy:

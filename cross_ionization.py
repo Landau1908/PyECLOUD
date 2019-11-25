@@ -183,9 +183,13 @@ class Ionization_Process(object):
                 vy_new_MPs = np.zeros(N_new_MPs)
                 vz_new_MPs = np.zeros(N_new_MPs)
 
-                vx_new_MPs = v0_gen * (rand(N_new_MPs) - 0.5)
-                vy_new_MPs = v0_gen * (rand(N_new_MPs) - 0.5)
-                vz_new_MPs = v0_gen * (rand(N_new_MPs) - 0.5)
+                # vx_new_MPs = v0_gen * (rand(N_new_MPs) - 0.5)
+                # vy_new_MPs = v0_gen * (rand(N_new_MPs) - 0.5)
+                # vz_new_MPs = v0_gen * (rand(N_new_MPs) - 0.5)
+
+                vx_new_MPs = v0_gen * np.random.randn(N_new_MPs)
+                vy_new_MPs = v0_gen * np.random.randn(N_new_MPs)
+                vz_new_MPs = v0_gen * np.random.randn(N_new_MPs)
 
             else:
                 nel_new_MPs = np.array([])
@@ -284,10 +288,12 @@ class Cross_Ionization(object):
         # Initialize dictionary for quantities to save
         self.nel_cross_ion = {}
         self.N_mp_cross_ion = {}
+        self.E_eV_cross_ion = {}
         self.DN_proj = {}
         for cloud in cloud_list:
             self.nel_cross_ion[cloud.name] = 0.
             self.N_mp_cross_ion[cloud.name] = 0
+            self.E_eV_cross_ion[cloud.name] = 0.
             self.DN_proj[cloud.name] = 0.
 
 
@@ -357,9 +363,14 @@ class Cross_Ionization(object):
                                      t_last_impact)
 
                 # Add to saved data
+                v2_new_mps = (new_mps['vx_new_MPs'] * new_mps['vx_new_MPs'] +
+                              new_mps['vy_new_MPs'] * new_mps['vy_new_MPs'] +
+                              new_mps['vz_new_MPs'] * new_mps['vz_new_MPs'])
+                self.E_eV_cross_ion[thiscloud.name] += 0.5 * MP_e.mass / qe * np.sum(v2_new_mps)
                 self.nel_cross_ion[thiscloud.name] += np.sum(new_mps['nel_new_MPs'])
                 self.N_mp_cross_ion[thiscloud.name] += new_mps['N_new_MPs']
             else:
+                self.E_eV_cross_ion[thiscloud.name] += 0.
                 self.nel_cross_ion[thiscloud.name] += 0.
                 self.N_mp_cross_ion[thiscloud.name] += 0
 
@@ -368,12 +379,14 @@ class Cross_Ionization(object):
 
         thiscloud_nel_cross_ion = self.nel_cross_ion[cloud_name]
         thiscloud_N_mp_cross_ion = self.N_mp_cross_ion[cloud_name]
+        thiscloud_E_eV_cross_ion = self.E_eV_cross_ion[cloud_name]
         thiscloud_DN_proj = self.DN_proj[cloud_name]
         self.nel_cross_ion[cloud_name] = 0.
-        self.N_mp_cross_ion[cloud_name] = 0.
+        self.N_mp_cross_ion[cloud_name] = 0
+        self.E_eV_cross_ion[cloud_name] = 0.
         self.DN_proj[cloud_name] = 0.
 
-        return thiscloud_nel_cross_ion, thiscloud_N_mp_cross_ion, thiscloud_DN_proj
+        return thiscloud_nel_cross_ion, thiscloud_N_mp_cross_ion, thiscloud_E_eV_cross_ion, thiscloud_DN_proj
 
 
     def _extract_sigma(self, Dt, cloud_dict, n_rep, energy_eV):
