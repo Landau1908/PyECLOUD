@@ -1,4 +1,4 @@
-#-Begin-preamble-------------------------------------------------------
+# -Begin-preamble-------------------------------------------------------
 #
 #                           CERN
 #
@@ -48,7 +48,7 @@
 #     The material cannot be sold. CERN should be  given  credit  in
 #     all references.
 #
-#-End-preamble---------------------------------------------------------
+# -End-preamble---------------------------------------------------------
 
 from numpy import sqrt, exp
 from numpy.random import rand
@@ -64,8 +64,8 @@ def yield_fun3(E, costheta, Emax, del_max, R0, E0):
 
     x = E / E_max_tilde
 
-    del_true_sec = del_max_tilde * (s * x) / (s - 1 + x**s)
-    del_reflected = R0 * ((sqrt(E) - sqrt(E + E0)) / (sqrt(E) + sqrt(E + E0)))**2
+    del_true_sec = del_max_tilde * (s * x) / (s - 1 + x ** s)
+    del_reflected = R0 * ((sqrt(E) - sqrt(E + E0)) / (sqrt(E) + sqrt(E + E0))) ** 2
 
     delta = del_true_sec + del_reflected
 
@@ -75,39 +75,53 @@ def yield_fun3(E, costheta, Emax, del_max, R0, E0):
 
 
 class SEY_model_acc_low_ene(SEY_model_ECLOUD):
-    def __init__(self, Emax, del_max, R0, E0=150,
-                 E_th=None, sigmafit=None, mufit=None,
-                 switch_no_increase_energy=0, thresh_low_energy=None, secondary_angle_distribution=None,
-                    ):
+    def __init__(
+        self,
+        Emax,
+        del_max,
+        R0,
+        E0=150,
+        E_th=None,
+        sigmafit=None,
+        mufit=None,
+        switch_no_increase_energy=0,
+        thresh_low_energy=None,
+        secondary_angle_distribution=None,
+    ):
 
-            self.E_th = E_th
-            self.sigmafit = sigmafit
-            self.mufit = mufit
-            self.switch_no_increase_energy = switch_no_increase_energy
-            self.thresh_low_energy = thresh_low_energy
-            self.secondary_angle_distribution = secondary_angle_distribution
+        self.E_th = E_th
+        self.sigmafit = sigmafit
+        self.mufit = mufit
+        self.switch_no_increase_energy = switch_no_increase_energy
+        self.thresh_low_energy = thresh_low_energy
+        self.secondary_angle_distribution = secondary_angle_distribution
 
-            if secondary_angle_distribution is not None:
-                from . import electron_emission
-                self.angle_dist_func = electron_emission.get_angle_dist_func(secondary_angle_distribution)
-            else:
-                self.angle_dist_func = None
+        if secondary_angle_distribution is not None:
+            from . import electron_emission
 
-            self.Emax = Emax
-            self.del_max = del_max
-            self.R0 = R0
-            self.E0 = E0
+            self.angle_dist_func = electron_emission.get_angle_dist_func(
+                secondary_angle_distribution
+            )
+        else:
+            self.angle_dist_func = None
+
+        self.Emax = Emax
+        self.del_max = del_max
+        self.R0 = R0
+        self.E0 = E0
 
     def SEY_process(self, nel_impact, E_impact_eV, costheta_impact, i_impact):
 
-            del_true_sec, del_reflected, ref_frac = yield_fun3(E_impact_eV, costheta_impact, self.Emax, self.del_max, self.R0, E0=self.E0)
-            ref_prob = del_reflected
-            beta_ts = del_true_sec / (1. - del_reflected)
+        del_true_sec, del_reflected, ref_frac = yield_fun3(
+            E_impact_eV, costheta_impact, self.Emax, self.del_max, self.R0, E0=self.E0
+        )
+        ref_prob = del_reflected
+        beta_ts = del_true_sec / (1.0 - del_reflected)
 
-            flag_elast = (rand(len(ref_prob)) < ref_prob)
-            flag_truesec = ~(flag_elast)
+        flag_elast = rand(len(ref_prob)) < ref_prob
+        flag_truesec = ~(flag_elast)
 
-            nel_emit = nel_impact.copy()
-            nel_emit[flag_truesec] = nel_impact[flag_truesec] * beta_ts[flag_truesec]
+        nel_emit = nel_impact.copy()
+        nel_emit[flag_truesec] = nel_impact[flag_truesec] * beta_ts[flag_truesec]
 
-            return nel_emit, flag_elast, flag_truesec
+        return nel_emit, flag_elast, flag_truesec

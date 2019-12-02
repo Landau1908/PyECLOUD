@@ -68,7 +68,7 @@ class BuildupSimulation(object):
         skip_pyeclsaver=False,
         ignore_kwargs=[],
         spacech_ele=None,
-        **kwargs
+        **kwargs,
     ):
 
         print("PyECLOUD Version 8.3.0")
@@ -91,7 +91,7 @@ class BuildupSimulation(object):
             skip_spacech_ele=skip_spacech_ele,
             spacech_ele=spacech_ele,
             ignore_kwargs=ignore_kwargs,
-            **kwargs
+            **kwargs,
         )
 
         self.config_dict = config_dict

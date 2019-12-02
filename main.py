@@ -1,4 +1,4 @@
-#-Begin-preamble-------------------------------------------------------
+# -Begin-preamble-------------------------------------------------------
 #
 #                           CERN
 #
@@ -48,16 +48,18 @@
 #     The material cannot be sold. CERN should be  given  credit  in
 #     all references.
 #
-#-End-preamble---------------------------------------------------------
+# -End-preamble---------------------------------------------------------
 
-#for compatibility with old PyECLOUD versions
+# for compatibility with old PyECLOUD versions
 
 try:
     from .buildup_simulation import BuildupSimulation
-    print('Imported from local folder')
+
+    print("Imported from local folder")
 except ImportError:
     from PyECLOUD.buildup_simulation import BuildupSimulation
-    print('Imported from PyECLOUD folder')
+
+    print("Imported from PyECLOUD folder")
 
 
 sim = BuildupSimulation()

@@ -8,50 +8,51 @@ import numpy as np
 
 def mystyle(fontsz=16):
     rcdefaults()
-    version = matplotlib.__version__.split('.')[0]
-    if version == '2':
-        print('Reverting matplotlib look to v1.5')
-        plt.rcParams['axes.autolimit_mode'] = 'round_numbers'
-        plt.rcParams['axes.xmargin'] = 0
-        plt.rcParams['axes.ymargin'] = 0
-        plt.rcParams['xtick.direction'] = 'in'
-        plt.rcParams['ytick.direction'] = 'in'
-        plt.rcParams['xtick.top'] = True
-        plt.rcParams['ytick.right'] = True
-        plt.rcParams['legend.numpoints'] = 1
-        plt.style.use('classic')
+    version = matplotlib.__version__.split(".")[0]
+    if version == "2":
+        print("Reverting matplotlib look to v1.5")
+        plt.rcParams["axes.autolimit_mode"] = "round_numbers"
+        plt.rcParams["axes.xmargin"] = 0
+        plt.rcParams["axes.ymargin"] = 0
+        plt.rcParams["xtick.direction"] = "in"
+        plt.rcParams["ytick.direction"] = "in"
+        plt.rcParams["xtick.top"] = True
+        plt.rcParams["ytick.right"] = True
+        plt.rcParams["legend.numpoints"] = 1
+        plt.style.use("classic")
 
     font = {  # 'family' : 'normal',
         #'weight' : 'bold',
-            'size'   : fontsz}
-#   print fontsz
-    rc('font', **font)
+        "size": fontsz
+    }
+    #   print fontsz
+    rc("font", **font)
 
 
 def mystyle_arial(fontsz=16, dist_tick_lab=10):
 
     mystyle(fontsz)
-    rc('font', **{'family': 'sans-serif', 'sans-serif': ['arial'], 'size': fontsz})
-    rc(('xtick.major', 'xtick.minor', 'ytick.major', 'ytick.minor'), pad=dist_tick_lab)
+    rc("font", **{"family": "sans-serif", "sans-serif": ["arial"], "size": fontsz})
+    rc(("xtick.major", "xtick.minor", "ytick.major", "ytick.minor"), pad=dist_tick_lab)
 
 
 def sciy():
-    pl.gca().ticklabel_format(style='sci', scilimits=(0, 0), axis='y')
+    pl.gca().ticklabel_format(style="sci", scilimits=(0, 0), axis="y")
 
 
 def scix():
-    pl.gca().ticklabel_format(style='sci', scilimits=(0, 0), axis='x')
+    pl.gca().ticklabel_format(style="sci", scilimits=(0, 0), axis="x")
 
 
-def colorprog(i_prog, Nplots, v1=.9, v2=1., cm='hsv'):
-    if hasattr(Nplots, '__len__'):
+def colorprog(i_prog, Nplots, v1=0.9, v2=1.0, cm="hsv"):
+    if hasattr(Nplots, "__len__"):
         Nplots = len(Nplots)
-    if cm == 'hsv':
+    if cm == "hsv":
         return hsv_to_rgb(float(i_prog) / float(Nplots), v1, v2)
-    elif cm == 'rainbow':
+    elif cm == "rainbow":
         return [pl.cm.rainbow(k) for k in np.linspace(0, 1, Nplots)][i_prog]
     else:
-        raise ValueError('What?!')
+        raise ValueError("What?!")
 
 
 def comb_legend(sp1, sp2, *args, **kwargs):
@@ -65,12 +66,12 @@ def comb_legend(sp1, sp2, *args, **kwargs):
 
 def mystyle_2(fontsz=16, dist_tick_lab=10, figsize=(12, 10)):
     rcdefaults()
-    RcParams['axes.grid'] = True
-    RcParams['axes.linewidth'] = 2.0
-    RcParams['figure.facecolor'] = 'w'
+    RcParams["axes.grid"] = True
+    RcParams["axes.linewidth"] = 2.0
+    RcParams["figure.facecolor"] = "w"
 
-    rc('font', **{'family': 'sans-serif', 'sans-serif': ['arial'], 'size': fontsz})
-    rc(('xtick.major', 'xtick.minor', 'ytick.major', 'ytick.minor'), pad=dist_tick_lab)
+    rc("font", **{"family": "sans-serif", "sans-serif": ["arial"], "size": fontsz})
+    rc(("xtick.major", "xtick.minor", "ytick.major", "ytick.minor"), pad=dist_tick_lab)
 
 
 def figure(title, figs=None, figsize=(12, 10), **kwargs):
@@ -78,7 +79,7 @@ def figure(title, figs=None, figsize=(12, 10), **kwargs):
     fig.canvas.set_window_title(title)
     if figs != None:
         figs.append(fig)
-    fig.patch.set_facecolor('w')
+    fig.patch.set_facecolor("w")
     plt.suptitle(title, fontsize=16)
     fig.subplots_adjust(left=0.07, right=0.80, wspace=0.5)
     return fig
@@ -378,4 +379,3 @@ RcParams({u'agg.path.chunksize': 0,
           u'ytick.minor.visible': False,
           u'ytick.minor.width': 0.5})
 """
-

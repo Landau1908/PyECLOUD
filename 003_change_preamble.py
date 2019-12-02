@@ -1,4 +1,6 @@
-raise ValueError("Not to be used to change the version!\nComment this line to change preamble.")
+raise ValueError(
+    "Not to be used to change the version!\nComment this line to change preamble."
+)
 
 
 import os
@@ -8,8 +10,8 @@ in_preamble = 1
 after_preamble = 2
 
 
-id_preamble_begin = '#-Begin-preamble----'
-id_preamble_end = '#-End-preamble--------'
+id_preamble_begin = "#-Begin-preamble----"
+id_preamble_end = "#-End-preamble--------"
 
 preamble_new = """#-Begin-preamble-------------------------------------------------------
 #
@@ -63,19 +65,19 @@ preamble_new = """#-Begin-preamble----------------------------------------------
 #
 #-End-preamble---------------------------------------------------------"""
 
-new_preamble_lines = preamble_new.split('\n')
+new_preamble_lines = preamble_new.split("\n")
 
 
-for dirpath, _, filenames in os.walk('.'):
+for dirpath, _, filenames in os.walk("."):
     full_paths = [os.path.join(dirpath, x) for x in filenames]
 
-    python_files = [x for x in full_paths if x.endswith('.py')]
+    python_files = [x for x in full_paths if x.endswith(".py")]
     for path in python_files:
 
         if os.path.abspath(path) == os.path.abspath(__file__):
             continue
 
-        with open(path, 'r') as f:
+        with open(path, "r") as f:
             content = f.read()
 
         if new_preamble_lines[0] not in content:
@@ -83,7 +85,7 @@ for dirpath, _, filenames in os.walk('.'):
 
         print(path)
 
-        lines = content.split('\n')
+        lines = content.split("\n")
 
         prev_line = None
         new_lines = []
@@ -105,9 +107,10 @@ for dirpath, _, filenames in os.walk('.'):
 
             prev_line = line
 
-        new_lines = [x + '\n' for ctr, x in enumerate(new_lines) if ctr + 1 != len(new_lines)]
+        new_lines = [
+            x + "\n" for ctr, x in enumerate(new_lines) if ctr + 1 != len(new_lines)
+        ]
 
-        with open(path, 'w') as f:
+        with open(path, "w") as f:
             f.writelines(new_lines)
-        print(('Modified %s' % path))
-
+        print(("Modified %s" % path))

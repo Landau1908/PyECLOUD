@@ -1,4 +1,4 @@
-#----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 #
 #                           CERN
 #
@@ -47,12 +47,25 @@
 #
 #     The material cannot be sold. CERN should be  given  credit  in
 #     all references.
-#----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 
 
 class Cloud(object):
-    def __init__(self, cloudname, config_dict, MP_e, impact_man, dynamics, pyeclsaver,
-                 gas_ion_flag, resgasion, t_ion, photoem_flag, phemiss, rho):
+    def __init__(
+        self,
+        cloudname,
+        config_dict,
+        MP_e,
+        impact_man,
+        dynamics,
+        pyeclsaver,
+        gas_ion_flag,
+        resgasion,
+        t_ion,
+        photoem_flag,
+        phemiss,
+        rho,
+    ):
 
         self.name = cloudname
         self.config_dict = config_dict
@@ -66,4 +79,3 @@ class Cloud(object):
         self.phemiss = phemiss
         self.pyeclsaver = pyeclsaver
         self.rho = rho
-

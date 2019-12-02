@@ -1,4 +1,4 @@
-#-Begin-preamble-------------------------------------------------------
+# -Begin-preamble-------------------------------------------------------
 #
 #                           CERN
 #
@@ -48,7 +48,7 @@
 #     The material cannot be sold. CERN should be  given  credit  in
 #     all references.
 #
-#-End-preamble---------------------------------------------------------
+# -End-preamble---------------------------------------------------------
 
 
 import numpy as np
@@ -65,7 +65,6 @@ class PyECLOUD_PhotoemissionException(ValueError):
 
 
 class photoemission_base(object):
-
     def get_number_new_mps(self, k_pe_st, lambda_t, Dt, nel_mp_ref):
 
         if self.flag_continuous_emission:
@@ -79,40 +78,69 @@ class photoemission_base(object):
     def gen_energy_and_set_MPs(self, Nint_new_MP, x_in, y_in, x_out, y_out, MP_e):
         # Assumes convex_chamber
 
-        #generate points and normals
+        # generate points and normals
         z_in = z_out = np.zeros_like(x_out, float)
         x_int, y_int, _, Norm_x, Norm_y, i_found = self.chamb.impact_point_and_normal(
-            x_in, y_in, z_in, x_out, y_out, z_out, resc_fac=self.resc_fac)
+            x_in, y_in, z_in, x_out, y_out, z_out, resc_fac=self.resc_fac
+        )
 
-        #generate energies (the same distr. for all photoelectr.)
+        # generate energies (the same distr. for all photoelectr.)
         En_gen = self.get_energy(Nint_new_MP)  # in eV
 
         # generate velocities like in impact managment
-        vx_gen, vy_gen, vz_gen = self.angle_dist_func(Nint_new_MP, En_gen, Norm_x, Norm_y, MP_e.mass)
+        vx_gen, vy_gen, vz_gen = self.angle_dist_func(
+            Nint_new_MP, En_gen, Norm_x, Norm_y, MP_e.mass
+        )
 
         t_last_impact = -1
-        MP_e.add_new_MPs(Nint_new_MP, MP_e.nel_mp_ref, x_int, y_int, 0., vx_gen, vy_gen, vz_gen, t_last_impact)
+        MP_e.add_new_MPs(
+            Nint_new_MP,
+            MP_e.nel_mp_ref,
+            x_int,
+            y_int,
+            0.0,
+            vx_gen,
+            vy_gen,
+            vz_gen,
+            t_last_impact,
+        )
 
 
 class photoemission(photoemission_base):
+    def __init__(
+        self,
+        inv_CDF_refl_photoem_file,
+        k_pe_st,
+        refl_frac,
+        e_pe_sigma,
+        e_pe_max,
+        alimit,
+        x0_refl,
+        y0_refl,
+        out_radius,
+        chamb,
+        resc_fac,
+        energy_distribution,
+        photoelectron_angle_distribution,
+        beamtim=None,
+        flag_continuous_emission=False,
+    ):
 
-    def __init__(self, inv_CDF_refl_photoem_file, k_pe_st, refl_frac, e_pe_sigma, e_pe_max, alimit, x0_refl,
-                 y0_refl, out_radius, chamb, resc_fac, energy_distribution, photoelectron_angle_distribution,
-                 beamtim=None, flag_continuous_emission=False):
-
-        print('Start photoemission init.')
+        print("Start photoemission init.")
 
         if not chamb.is_convex():
-            print('Warning! This photoemission module is not suited for a non-convex chamber!')
+            print(
+                "Warning! This photoemission module is not suited for a non-convex chamber!"
+            )
 
-        if inv_CDF_refl_photoem_file == 'unif_no_file':
+        if inv_CDF_refl_photoem_file == "unif_no_file":
             self.flag_unif = True
 
         else:
             self.flag_unif = False
             dict_psi_inv_CDF = sio.loadmat(inv_CDF_refl_photoem_file)
-            self.inv_CDF_refl = np.squeeze(dict_psi_inv_CDF['inv_CDF'].real)
-            self.u_sam_CDF_refl = np.squeeze(dict_psi_inv_CDF['u_sam'].real)
+            self.inv_CDF_refl = np.squeeze(dict_psi_inv_CDF["inv_CDF"].real)
+            self.u_sam_CDF_refl = np.squeeze(dict_psi_inv_CDF["u_sam"].real)
 
         self.k_pe_st = k_pe_st
         self.refl_frac = refl_frac
@@ -123,23 +151,33 @@ class photoemission(photoemission_base):
         self.out_radius = out_radius
         self.chamb = chamb
         self.resc_fac = resc_fac
-        self.angle_dist_func = electron_emission.get_angle_dist_func(photoelectron_angle_distribution)
+        self.angle_dist_func = electron_emission.get_angle_dist_func(
+            photoelectron_angle_distribution
+        )
         self.flag_continuous_emission = flag_continuous_emission
 
         if flag_continuous_emission:
             self.mean_lambda = np.mean(beamtim.lam_t_array)
 
-        if y0_refl != 0.:
-            raise PyECLOUD_PhotoemissionException('The case y0_refl!=0 is NOT IMPLEMETED yet!!!!')
+        if y0_refl != 0.0:
+            raise PyECLOUD_PhotoemissionException(
+                "The case y0_refl!=0 is NOT IMPLEMETED yet!!!!"
+            )
 
-        if x0_refl == 'left' or x0_refl=='right':
-            if x0_refl == 'left':
+        if x0_refl == "left" or x0_refl == "right":
+            if x0_refl == "left":
                 xout = -self.out_radius
-            elif x0_refl == 'right':
+            elif x0_refl == "right":
                 xout = self.out_radius
             x_int, _, _, _, _, _ = self.chamb.impact_point_and_normal(
-                np.array([0.]), np.array([0.]), np.array([0.]),
-                3.*np.array([xout]), np.array([0.]), np.array([0.]),resc_fac=0.99999)
+                np.array([0.0]),
+                np.array([0.0]),
+                np.array([0.0]),
+                3.0 * np.array([xout]),
+                np.array([0.0]),
+                np.array([0.0]),
+                resc_fac=0.99999,
+            )
             self.x0_refl = x_int[0]
         else:
             self.x0_refl = x0_refl
@@ -147,54 +185,66 @@ class photoemission(photoemission_base):
         x0_refl_np_arr = np.array([self.x0_refl])
         y0_refl_np_arr = np.array([self.y0_refl])
         if np.any(self.chamb.is_outside(x0_refl_np_arr, y0_refl_np_arr)):
-            raise PyECLOUD_PhotoemissionException('x0_refl, y0_refl is outside of the chamber!')
+            raise PyECLOUD_PhotoemissionException(
+                "x0_refl, y0_refl is outside of the chamber!"
+            )
 
-        self.get_energy = electron_emission.get_energy_distribution_func(energy_distribution, e_pe_sigma, e_pe_max)
+        self.get_energy = electron_emission.get_energy_distribution_func(
+            energy_distribution, e_pe_sigma, e_pe_max
+        )
 
         # Check that outer circle is correct
-        psi_gen = np.linspace(0, 2.*np.pi, 10000)
-        x_out = -2. * self.out_radius * np.cos(psi_gen) + self.x0_refl
-        y_out = 2. * self.out_radius * np.sin(psi_gen)
+        psi_gen = np.linspace(0, 2.0 * np.pi, 10000)
+        x_out = -2.0 * self.out_radius * np.cos(psi_gen) + self.x0_refl
+        y_out = 2.0 * self.out_radius * np.sin(psi_gen)
         if np.any(~self.chamb.is_outside(x_out, y_out)):
-            raise ValueError('Photoemission circle points are inside the chamber, check your settings!')
-        psi_gen = np.linspace(0, 2.*np.pi, 10000)
+            raise ValueError(
+                "Photoemission circle points are inside the chamber, check your settings!"
+            )
+        psi_gen = np.linspace(0, 2.0 * np.pi, 10000)
         x_out = self.out_radius * np.cos(psi_gen)
         y_out = self.out_radius * np.sin(psi_gen)
         if np.any(~self.chamb.is_outside(x_out, y_out)):
-            raise ValueError('Photoemission circle points are inside the chamber, check your settings!')
+            raise ValueError(
+                "Photoemission circle points are inside the chamber, check your settings!"
+            )
 
-        print('Done photoemission init. Energy distribution: %s' % energy_distribution)
+        print("Done photoemission init. Energy distribution: %s" % energy_distribution)
 
     def generate(self, MP_e, lambda_t, Dt):
 
-        Nint_new_MP = self.get_number_new_mps(self.k_pe_st, lambda_t, Dt, MP_e.nel_mp_ref)
+        Nint_new_MP = self.get_number_new_mps(
+            self.k_pe_st, lambda_t, Dt, MP_e.nel_mp_ref
+        )
 
         if Nint_new_MP > 0:
-            #generate appo x_in and x_out
+            # generate appo x_in and x_out
             x_in = np.zeros(Nint_new_MP)
             y_in = np.zeros(Nint_new_MP)
             x_out = np.zeros(Nint_new_MP)
             y_out = np.zeros(Nint_new_MP)
 
-            #for each one generate flag refl
-            refl_flag = (random.rand(Nint_new_MP) < self.refl_frac)
+            # for each one generate flag refl
+            refl_flag = random.rand(Nint_new_MP) < self.refl_frac
             gauss_flag = ~refl_flag
 
-            #generate psi for refl. photons generation
+            # generate psi for refl. photons generation
             N_refl = np.sum(refl_flag)
             if N_refl > 0:
                 u_gen = random.rand(N_refl)
                 if self.flag_unif:
-                    psi_gen = 2. * np.pi * u_gen
+                    psi_gen = 2.0 * np.pi * u_gen
                     x_out[refl_flag] = self.out_radius * np.cos(psi_gen)
                     y_out[refl_flag] = self.out_radius * np.sin(psi_gen)
                 else:
                     psi_gen = np.interp(u_gen, self.u_sam_CDF_refl, self.inv_CDF_refl)
                     x_in[refl_flag] = self.x0_refl
-                    x_out[refl_flag] = -2. * self.out_radius * np.cos(psi_gen) + self.x0_refl
-                    y_out[refl_flag] = 2. * self.out_radius * np.sin(psi_gen)
+                    x_out[refl_flag] = (
+                        -2.0 * self.out_radius * np.cos(psi_gen) + self.x0_refl
+                    )
+                    y_out[refl_flag] = 2.0 * self.out_radius * np.sin(psi_gen)
 
-            #generate theta for nonreflected photon generation
+            # generate theta for nonreflected photon generation
             N_gauss = np.sum(gauss_flag)
             if N_gauss > 0:
                 theta_gen = random.normal(0, self.alimit, N_gauss)
@@ -207,25 +257,38 @@ class photoemission(photoemission_base):
 
 
 class photoemission_from_file(photoemission_base):
-
-    def __init__(self, inv_CDF_all_photoem_file, chamb, resc_fac, energy_distribution, e_pe_sigma, e_pe_max,
-                 k_pe_st, out_radius, photoelectron_angle_distribution, beamtim=None, flag_continuous_emission=False):
+    def __init__(
+        self,
+        inv_CDF_all_photoem_file,
+        chamb,
+        resc_fac,
+        energy_distribution,
+        e_pe_sigma,
+        e_pe_max,
+        k_pe_st,
+        out_radius,
+        photoelectron_angle_distribution,
+        beamtim=None,
+        flag_continuous_emission=False,
+    ):
         if isinstance(inv_CDF_all_photoem_file, str):
-            print('Start photoemission init from file %s.' % inv_CDF_all_photoem_file)
+            print("Start photoemission init from file %s." % inv_CDF_all_photoem_file)
         elif isinstance(inv_CDF_all_photoem_file, dict):
-            print('Start photoemission init from dict.')
+            print("Start photoemission init from dict.")
 
         if not chamb.is_convex():
-            print('Warning! This photoemission module is not suited for a non-convex chamber!')
+            print(
+                "Warning! This photoemission module is not suited for a non-convex chamber!"
+            )
 
-        self.flag_unif = (inv_CDF_all_photoem_file == 'unif_no_file')
+        self.flag_unif = inv_CDF_all_photoem_file == "unif_no_file"
         if not self.flag_unif:
             if isinstance(inv_CDF_all_photoem_file, dict):
                 mat = inv_CDF_all_photoem_file
             else:
                 mat = sio.loadmat(inv_CDF_all_photoem_file)
-            self.u_sam = np.squeeze(mat['u_sam'])
-            self.angles = np.squeeze(mat['angles'])
+            self.u_sam = np.squeeze(mat["u_sam"])
+            self.angles = np.squeeze(mat["angles"])
 
         self.k_pe_st = k_pe_st
         self.out_radius = out_radius
@@ -236,13 +299,19 @@ class photoemission_from_file(photoemission_base):
         if flag_continuous_emission:
             self.mean_lambda = np.mean(beamtim.lam_t_array)
 
-        self.get_energy = electron_emission.get_energy_distribution_func(energy_distribution, e_pe_sigma, e_pe_max)
-        self.angle_dist_func = electron_emission.get_angle_dist_func(photoelectron_angle_distribution)
-        print('Done photoemission init')
+        self.get_energy = electron_emission.get_energy_distribution_func(
+            energy_distribution, e_pe_sigma, e_pe_max
+        )
+        self.angle_dist_func = electron_emission.get_angle_dist_func(
+            photoelectron_angle_distribution
+        )
+        print("Done photoemission init")
 
     def generate(self, MP_e, lambda_t, Dt):
 
-        Nint_new_MP = self.get_number_new_mps(self.k_pe_st, lambda_t, Dt, MP_e.nel_mp_ref)
+        Nint_new_MP = self.get_number_new_mps(
+            self.k_pe_st, lambda_t, Dt, MP_e.nel_mp_ref
+        )
         if Nint_new_MP > 0:
 
             if self.flag_unif:
@@ -261,28 +330,55 @@ class photoemission_from_file(photoemission_base):
 
 
 class photoemission_per_segment(photoemission_base):
-
-    def __init__(self, chamb, energy_distribution, e_pe_sigma, e_pe_max, k_pe_st,
-                 photoelectron_angle_distribution, beamtim=None, flag_continuous_emission=False):
-        print('Start photoemission per segment init')
+    def __init__(
+        self,
+        chamb,
+        energy_distribution,
+        e_pe_sigma,
+        e_pe_max,
+        k_pe_st,
+        photoelectron_angle_distribution,
+        beamtim=None,
+        flag_continuous_emission=False,
+    ):
+        print("Start photoemission per segment init")
         self.k_pe_st = k_pe_st
         self.chamb = chamb
         self.flag_continuous_emission = flag_continuous_emission
-        self.get_energy = electron_emission.get_energy_distribution_func(energy_distribution, e_pe_sigma, e_pe_max)
-        self.angle_dist_func = electron_emission.get_angle_dist_func(photoelectron_angle_distribution)
+        self.get_energy = electron_emission.get_energy_distribution_func(
+            energy_distribution, e_pe_sigma, e_pe_max
+        )
+        self.angle_dist_func = electron_emission.get_angle_dist_func(
+            photoelectron_angle_distribution
+        )
         if self.flag_continuous_emission:
             self.mean_lambda = np.mean(beamtim.lam_t_array)
-        print('Done photoemission init')
+        print("Done photoemission init")
 
     def generate(self, MP_e, lambda_t, Dt):
 
-        Nint_new_MP = self.get_number_new_mps(self.k_pe_st, lambda_t, Dt, MP_e.nel_mp_ref)
+        Nint_new_MP = self.get_number_new_mps(
+            self.k_pe_st, lambda_t, Dt, MP_e.nel_mp_ref
+        )
         if Nint_new_MP > 0:
-            x_new_mp, y_new_mp, Norm_x, Norm_y = self.chamb.get_photoelectron_positions(Nint_new_MP)
+            x_new_mp, y_new_mp, Norm_x, Norm_y = self.chamb.get_photoelectron_positions(
+                Nint_new_MP
+            )
             En_gen = self.get_energy(Nint_new_MP)  # in eV
-            vx_gen, vy_gen, vz_gen = self.angle_dist_func(Nint_new_MP, En_gen, Norm_x, Norm_y, MP_e.mass)
+            vx_gen, vy_gen, vz_gen = self.angle_dist_func(
+                Nint_new_MP, En_gen, Norm_x, Norm_y, MP_e.mass
+            )
             t_last_impact = -1
-            MP_e.add_new_MPs(x_new_mp.size, MP_e.nel_mp_ref, x_new_mp, y_new_mp, 0., vx_gen, vy_gen, vz_gen, t_last_impact)
+            MP_e.add_new_MPs(
+                x_new_mp.size,
+                MP_e.nel_mp_ref,
+                x_new_mp,
+                y_new_mp,
+                0.0,
+                vx_gen,
+                vy_gen,
+                vz_gen,
+                t_last_impact,
+            )
 
         return MP_e
-

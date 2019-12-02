@@ -1,4 +1,4 @@
-#-Begin-preamble-------------------------------------------------------
+# -Begin-preamble-------------------------------------------------------
 #
 #                           CERN
 #
@@ -48,7 +48,7 @@
 #     The material cannot be sold. CERN should be  given  credit  in
 #     all references.
 #
-#-End-preamble---------------------------------------------------------
+# -End-preamble---------------------------------------------------------
 
 from numpy import sqrt, exp, cos, pi, logical_and
 from numpy.random import rand
@@ -59,12 +59,12 @@ def yield_fun2(E, costheta, Emax, del_max, R0):
 
     s = 1.35
 
-    del_max_tilde = del_max * exp(0.5 * (1. - costheta))
-    E_max_tilde = Emax * (1. + 0.7 * (1. - costheta))
+    del_max_tilde = del_max * exp(0.5 * (1.0 - costheta))
+    E_max_tilde = Emax * (1.0 + 0.7 * (1.0 - costheta))
 
     x = E / E_max_tilde
 
-    true_sec = del_max_tilde * (s * x) / (s - 1. + x**s)
+    true_sec = del_max_tilde * (s * x) / (s - 1.0 + x ** s)
 
     delta = true_sec
 
@@ -78,34 +78,46 @@ def yield_fun2(E, costheta, Emax, del_max, R0):
 
 
 class SEY_model_flat_le(SEY_model_ECLOUD):
-    def __init__(self, Emax, del_max, R0,
-                 E_th=None, sigmafit=None, mufit=None,
-                 switch_no_increase_energy=0, thresh_low_energy=None, secondary_angle_distribution=None,
-                    ):
+    def __init__(
+        self,
+        Emax,
+        del_max,
+        R0,
+        E_th=None,
+        sigmafit=None,
+        mufit=None,
+        switch_no_increase_energy=0,
+        thresh_low_energy=None,
+        secondary_angle_distribution=None,
+    ):
 
-            self.E_th = E_th
-            self.sigmafit = sigmafit
-            self.mufit = mufit
-            self.switch_no_increase_energy = switch_no_increase_energy
-            self.thresh_low_energy = thresh_low_energy
-            self.secondary_angle_distribution = secondary_angle_distribution
+        self.E_th = E_th
+        self.sigmafit = sigmafit
+        self.mufit = mufit
+        self.switch_no_increase_energy = switch_no_increase_energy
+        self.thresh_low_energy = thresh_low_energy
+        self.secondary_angle_distribution = secondary_angle_distribution
 
-            if secondary_angle_distribution is not None:
-                from . import electron_emission
-                self.angle_dist_func = electron_emission.get_angle_dist_func(secondary_angle_distribution)
-            else:
-                self.angle_dist_func = None
+        if secondary_angle_distribution is not None:
+            from . import electron_emission
 
-            self.Emax = Emax
-            self.del_max = del_max
-            self.R0 = R0
-            print('Secondary emission model: Flat Low Energy ')
+            self.angle_dist_func = electron_emission.get_angle_dist_func(
+                secondary_angle_distribution
+            )
+        else:
+            self.angle_dist_func = None
+
+        self.Emax = Emax
+        self.del_max = del_max
+        self.R0 = R0
+        print("Secondary emission model: Flat Low Energy ")
 
     def SEY_process(self, nel_impact, E_impact_eV, costheta_impact, i_impact):
-            yiel, ref_frac = yield_fun2(E_impact_eV, costheta_impact, self.Emax, self.del_max, self.R0)
-            flag_elast = (rand(len(ref_frac)) < ref_frac)
-            flag_truesec = ~(flag_elast)
-            nel_emit = nel_impact * yiel
+        yiel, ref_frac = yield_fun2(
+            E_impact_eV, costheta_impact, self.Emax, self.del_max, self.R0
+        )
+        flag_elast = rand(len(ref_frac)) < ref_frac
+        flag_truesec = ~(flag_elast)
+        nel_emit = nel_impact * yiel
 
-            return nel_emit, flag_elast, flag_truesec
-
+        return nel_emit, flag_elast, flag_truesec

@@ -117,7 +117,7 @@ class Ecloud(object):
             self.verbose,
             self.save_pyecl_outp_as,
             self.force_interp_at_substeps_interacting_slices,
-            **self.kwargs
+            **self.kwargs,
         )
 
     def __init__(
@@ -134,7 +134,7 @@ class Ecloud(object):
         verbose=False,
         save_pyecl_outp_as=None,
         force_interp_at_substeps_interacting_slices=False,
-        **kwargs
+        **kwargs,
     ):
 
         print("PyECLOUD Version 8.3.0")
@@ -174,7 +174,9 @@ class Ecloud(object):
             force_interp_at_substeps_interacting_slices
         )
 
-        print(f"Reinterp fields at substeps for interacting slices: {self.force_interp_at_substeps_interacting_slices}")
+        print(
+            f"Reinterp fields at substeps for interacting slices: {self.force_interp_at_substeps_interacting_slices}"
+        )
 
         self.cloudsim = bsim.BuildupSimulation(
             pyecl_input_folder=pyecl_input_folder,
@@ -183,7 +185,7 @@ class Ecloud(object):
             ignore_kwargs=extra_allowed_kwargs,
             skip_pyeclsaver=(save_pyecl_outp_as is None),
             filen_main_outp=save_pyecl_outp_as,
-            **self.kwargs
+            **self.kwargs,
         )
 
         if self.cloudsim.config_dict["track_method"] == "Boris":
@@ -506,8 +508,10 @@ class Ecloud(object):
                 force_recompute_space_charge=force_recompute_space_charge,
                 skip_MP_cleaning=skip_MP_cleaning,
                 skip_MP_regen=skip_MP_regen,
-                force_reinterp_fields_at_substeps=(interact_with_EC
-                    and self.force_interp_at_substeps_interacting_slices)
+                force_reinterp_fields_at_substeps=(
+                    interact_with_EC
+                    and self.force_interp_at_substeps_interacting_slices
+                ),
             )
 
             if interact_with_EC:

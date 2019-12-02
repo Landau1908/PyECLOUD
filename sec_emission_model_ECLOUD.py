@@ -1,4 +1,4 @@
-#-Begin-preamble-------------------------------------------------------
+# -Begin-preamble-------------------------------------------------------
 #
 #                           CERN
 #
@@ -48,7 +48,7 @@
 #     The material cannot be sold. CERN should be  given  credit  in
 #     all references.
 #
-#-End-preamble---------------------------------------------------------
+# -End-preamble---------------------------------------------------------
 
 import numpy as np
 from numpy import sqrt, exp
@@ -56,26 +56,36 @@ from numpy.random import rand
 from . import electron_emission as ee
 
 
-def yield_fun2(E, costheta, Emax, del_max, R0, E0, s, flag_costheta_delta_scale=True, flag_costheta_Emax_shift=True):
+def yield_fun2(
+    E,
+    costheta,
+    Emax,
+    del_max,
+    R0,
+    E0,
+    s,
+    flag_costheta_delta_scale=True,
+    flag_costheta_Emax_shift=True,
+):
 
     if flag_costheta_delta_scale:
-        del_max_tilde = del_max * exp(0.5 * (1. - costheta))
+        del_max_tilde = del_max * exp(0.5 * (1.0 - costheta))
     else:
         del_max_tilde = del_max
 
     if flag_costheta_Emax_shift:
-        E_max_tilde = Emax * (1. + 0.7 * (1. - costheta))
+        E_max_tilde = Emax * (1.0 + 0.7 * (1.0 - costheta))
     else:
         E_max_tilde = Emax
 
     x = E / E_max_tilde
 
-    true_sec = del_max_tilde * (s * x) / (s - 1. + x**s)
-    reflected = R0 * ((sqrt(E) - sqrt(E + E0)) / (sqrt(E) + sqrt(E + E0)))**2.
+    true_sec = del_max_tilde * (s * x) / (s - 1.0 + x ** s)
+    reflected = R0 * ((sqrt(E) - sqrt(E + E0)) / (sqrt(E) + sqrt(E + E0))) ** 2.0
 
     delta = true_sec + reflected
-    ref_frac = 0. * delta
-    mask_non_zero = (delta > 0)
+    ref_frac = 0.0 * delta
+    mask_non_zero = delta > 0
     ref_frac[mask_non_zero] = reflected[mask_non_zero] / delta[mask_non_zero]
 
     return delta, ref_frac
@@ -83,15 +93,26 @@ def yield_fun2(E, costheta, Emax, del_max, R0, E0, s, flag_costheta_delta_scale=
 
 class SEY_model_ECLOUD(object):
 
-    event_types = {0: 'elast',
-                   1: 'true',
-                   }
+    event_types = {
+        0: "elast",
+        1: "true",
+    }
 
     def __init__(
-        self, Emax, del_max, R0,
-        E_th=None, sigmafit=None, mufit=None,
-        switch_no_increase_energy=0, thresh_low_energy=None, secondary_angle_distribution=None,
-        E0=150., s=1.35, flag_costheta_delta_scale=True, flag_costheta_Emax_shift=True
+        self,
+        Emax,
+        del_max,
+        R0,
+        E_th=None,
+        sigmafit=None,
+        mufit=None,
+        switch_no_increase_energy=0,
+        thresh_low_energy=None,
+        secondary_angle_distribution=None,
+        E0=150.0,
+        s=1.35,
+        flag_costheta_delta_scale=True,
+        flag_costheta_Emax_shift=True,
     ):
 
         self.E_th = E_th
@@ -103,7 +124,10 @@ class SEY_model_ECLOUD(object):
 
         if secondary_angle_distribution is not None:
             from . import electron_emission
-            self.angle_dist_func = electron_emission.get_angle_dist_func(secondary_angle_distribution)
+
+            self.angle_dist_func = electron_emission.get_angle_dist_func(
+                secondary_angle_distribution
+            )
         else:
             self.angle_dist_func = None
 
@@ -115,7 +139,7 @@ class SEY_model_ECLOUD(object):
         self.flag_costheta_delta_scale = flag_costheta_delta_scale
         self.flag_costheta_Emax_shift = flag_costheta_Emax_shift
 
-        print(('Secondary emission model: ECLOUD E0=%.4f s=%.4f' % (self.E0, self.s)))
+        print(("Secondary emission model: ECLOUD E0=%.4f s=%.4f" % (self.E0, self.s)))
 
     def SEY_model_evol(self, Dt):
         pass
@@ -123,19 +147,45 @@ class SEY_model_ECLOUD(object):
     def SEY_process(self, nel_impact, E_impact_eV, costheta_impact, i_impact):
 
         yiel, ref_frac = yield_fun2(
-            E_impact_eV, costheta_impact, self.Emax, self.del_max, self.R0, E0=self.E0, s=self.s,
-            flag_costheta_delta_scale=self.flag_costheta_delta_scale, flag_costheta_Emax_shift=self.flag_costheta_Emax_shift)
-        flag_elast = (rand(len(ref_frac)) < ref_frac)
+            E_impact_eV,
+            costheta_impact,
+            self.Emax,
+            self.del_max,
+            self.R0,
+            E0=self.E0,
+            s=self.s,
+            flag_costheta_delta_scale=self.flag_costheta_delta_scale,
+            flag_costheta_Emax_shift=self.flag_costheta_Emax_shift,
+        )
+        flag_elast = rand(len(ref_frac)) < ref_frac
         flag_truesec = ~(flag_elast)
         nel_emit = nel_impact * yiel
 
         return nel_emit, flag_elast, flag_truesec
 
-    def impacts_on_surface(self, mass, nel_impact, x_impact, y_impact, z_impact,
-                           vx_impact, vy_impact, vz_impact, Norm_x, Norm_y, i_found,
-                           v_impact_n, E_impact_eV, costheta_impact, nel_mp_th, flag_seg):
+    def impacts_on_surface(
+        self,
+        mass,
+        nel_impact,
+        x_impact,
+        y_impact,
+        z_impact,
+        vx_impact,
+        vy_impact,
+        vz_impact,
+        Norm_x,
+        Norm_y,
+        i_found,
+        v_impact_n,
+        E_impact_eV,
+        costheta_impact,
+        nel_mp_th,
+        flag_seg,
+    ):
 
-        nel_emit_tot_events, flag_elast, flag_truesec = self.SEY_process(nel_impact, E_impact_eV, costheta_impact, i_found)
+        nel_emit_tot_events, flag_elast, flag_truesec = self.SEY_process(
+            nel_impact, E_impact_eV, costheta_impact, i_found
+        )
 
         nel_replace = nel_emit_tot_events.copy()
         x_replace = x_impact.copy()
@@ -151,8 +201,11 @@ class SEY_model_ECLOUD(object):
 
         # Handle elastics
         vx_replace[flag_elast], vy_replace[flag_elast] = ee.specular_velocity(
-            vx_impact[flag_elast], vy_impact[flag_elast],
-            Norm_x[flag_elast], Norm_y[flag_elast], v_impact_n[flag_elast]
+            vx_impact[flag_elast],
+            vy_impact[flag_elast],
+            Norm_x[flag_elast],
+            Norm_y[flag_elast],
+            v_impact_n[flag_elast],
         )
 
         # true secondary
@@ -162,18 +215,35 @@ class SEY_model_ECLOUD(object):
 
             n_add = np.zeros_like(flag_truesec, dtype=int)
             n_add[flag_truesec] = np.ceil(nel_replace[flag_truesec] / nel_mp_th) - 1
-            n_add[n_add < 0] = 0.  # in case of underflow
-            nel_replace[flag_truesec] = nel_replace[flag_truesec] / (n_add[flag_truesec] + 1.)
+            n_add[n_add < 0] = 0.0  # in case of underflow
+            nel_replace[flag_truesec] = nel_replace[flag_truesec] / (
+                n_add[flag_truesec] + 1.0
+            )
 
             n_add_total = np.sum(n_add)
 
             # MPs to be replaced
             En_truesec_eV = ee.sec_energy_hilleret_model2(
-                self.switch_no_increase_energy, N_true_sec, self.sigmafit, self.mufit,
-                self.E_th, E_impact_eV[flag_truesec], self.thresh_low_energy)
+                self.switch_no_increase_energy,
+                N_true_sec,
+                self.sigmafit,
+                self.mufit,
+                self.E_th,
+                E_impact_eV[flag_truesec],
+                self.thresh_low_energy,
+            )
 
-            vx_replace[flag_truesec], vy_replace[flag_truesec], vz_replace[flag_truesec] = self.angle_dist_func(
-                N_true_sec, En_truesec_eV, Norm_x[flag_truesec], Norm_y[flag_truesec], mass)
+            (
+                vx_replace[flag_truesec],
+                vy_replace[flag_truesec],
+                vz_replace[flag_truesec],
+            ) = self.angle_dist_func(
+                N_true_sec,
+                En_truesec_eV,
+                Norm_x[flag_truesec],
+                Norm_y[flag_truesec],
+                mass,
+            )
 
             # Add new MPs
             if n_add_total != 0:
@@ -188,11 +258,18 @@ class SEY_model_ECLOUD(object):
 
                 # Generate new MP properties, angles and energies
                 En_truesec_eV_add = ee.sec_energy_hilleret_model2(
-                    self.switch_no_increase_energy, n_add_total, self.sigmafit, self.mufit,
-                    self.E_th, E_impact_eV_add, self.thresh_low_energy)
+                    self.switch_no_increase_energy,
+                    n_add_total,
+                    self.sigmafit,
+                    self.mufit,
+                    self.E_th,
+                    E_impact_eV_add,
+                    self.thresh_low_energy,
+                )
 
                 vx_new_MPs, vy_new_MPs, vz_new_MPs = self.angle_dist_func(
-                    n_add_total, En_truesec_eV_add, norm_x_add, norm_y_add, mass)
+                    n_add_total, En_truesec_eV_add, norm_x_add, norm_y_add, mass
+                )
 
                 if flag_seg:
                     i_seg_new_MPs = np.repeat(i_found, n_add)
@@ -216,8 +293,26 @@ class SEY_model_ECLOUD(object):
             events = np.concatenate([event_type, events_add])
         extended_event_type = events
 
-        event_info = {'extended_event_type': extended_event_type}
+        event_info = {"extended_event_type": extended_event_type}
 
-        return nel_emit_tot_events, event_type, event_info,\
-            nel_replace, x_replace, y_replace, z_replace, vx_replace, vy_replace, vz_replace, i_seg_replace,\
-            nel_new_MPs, x_new_MPs, y_new_MPs, z_new_MPs, vx_new_MPs, vy_new_MPs, vz_new_MPs, i_seg_new_MPs
+        return (
+            nel_emit_tot_events,
+            event_type,
+            event_info,
+            nel_replace,
+            x_replace,
+            y_replace,
+            z_replace,
+            vx_replace,
+            vy_replace,
+            vz_replace,
+            i_seg_replace,
+            nel_new_MPs,
+            x_new_MPs,
+            y_new_MPs,
+            z_new_MPs,
+            vx_new_MPs,
+            vy_new_MPs,
+            vz_new_MPs,
+            i_seg_new_MPs,
+        )

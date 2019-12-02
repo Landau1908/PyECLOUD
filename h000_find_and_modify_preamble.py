@@ -1,13 +1,13 @@
 import os
 
-begin = '''#----------------------------------------------------------------------
+begin = """#----------------------------------------------------------------------
 #
 #                           CERN
 #
 #     European Organization for Nuclear Research
-'''
+"""
 
-#-Begin-preamble-------------------------------------------------------
+# -Begin-preamble-------------------------------------------------------
 #
 #                           CERN
 #
@@ -57,38 +57,36 @@ begin = '''#--------------------------------------------------------------------
 #     The material cannot be sold. CERN should be  given  credit  in
 #     all references.
 #
-#-End-preamble---------------------------------------------------------
+# -End-preamble---------------------------------------------------------
 
 
-for dirpath, _, filenames in os.walk('.'):
+for dirpath, _, filenames in os.walk("."):
     full_paths = [os.path.join(dirpath, x) for x in filenames]
 
-    python_files = [x for x in full_paths if x.endswith('.py')]
+    python_files = [x for x in full_paths if x.endswith(".py")]
     for path in python_files:
 
         if os.path.abspath(path) == os.path.abspath(__file__):
             continue
 
-        with open(path, 'r') as f:
+        with open(path, "r") as f:
             content = f.read()
 
         if begin in content:
             print(path)
             content = content.replace(begin, newbegin)
 
-            with open(path, 'w') as f:
+            with open(path, "w") as f:
                 f.write(content)
 
         if end in content:
-            print('End to be changed:')
+            print("End to be changed:")
             print(path)
             content = content.replace(end, newend)
 
-            with open(path, 'w') as f:
+            with open(path, "w") as f:
                 f.write(content)
 
-        if '#--------------' in content:
-            print('Test')
+        if "#--------------" in content:
+            print("Test")
             print(path)
-
-

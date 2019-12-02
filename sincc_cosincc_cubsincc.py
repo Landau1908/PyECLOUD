@@ -1,4 +1,4 @@
-#-Begin-preamble-------------------------------------------------------
+# -Begin-preamble-------------------------------------------------------
 #
 #                           CERN
 #
@@ -48,7 +48,7 @@
 #     The material cannot be sold. CERN should be  given  credit  in
 #     all references.
 #
-#-End-preamble---------------------------------------------------------
+# -End-preamble---------------------------------------------------------
 
 from numpy import *
 
@@ -57,7 +57,7 @@ def sincc(x):
     th = 1e-4
 
     if abs(x) < th:
-        val = 1.
+        val = 1.0
     else:
         val = sin(x) / x
 
@@ -77,7 +77,7 @@ def cosincc(x):
 def cubsincc(x):
     th = 1e-4
     if abs(x) < th:
-        val = 1. / 6.
+        val = 1.0 / 6.0
     else:
         val = (x - sin(x)) / (x * x * x)
 
